@@ -1,27 +1,123 @@
+import {useState} from "react";
 
+import "./App.css";
 
-import MissionControl from "./MissionControl.jsx";
-
-function App ()
+function App ({minDamage = 0, maxDamage = 50})
 {
-	const INITIAL_MISSIONS = [
-		{id: 1, name: "Mars Rover", status: "Planned", crew: ["Alice", "Bob"]},
-		{id: 2, name: "Moon Base", status: "Active", crew: ["Charlie", "Dave"]},
-		{id: 3, name: "Venus Observatory", status: "Planned", crew: ["Eve", "Frank"]},
-		{id: 4, name: "Jupiter Moons Survey", status: "Completed", crew: ["Grace", "Hank"]},
-		{id: 5, name: "Asteroid Belt Mining", status: "Active", crew: ["Ivy", "John"]},
-		{id: 6, name: "Saturn Ring Research", status: "Planned", crew: ["Karen", "Leo"]},
-		{id: 7, name: "Deep Space Probe", status: "Completed", crew: ["Mia", "Nolan"]},
-		{id: 8, name: "Interstellar Observatory", status: "Planned", crew: ["Olivia", "Pete"]},
-		{id: 9, name: "Neptune Atmospheric Study", status: "Active", crew: ["Quinn", "Rachel"]},
-		{id: 10, name: "Pluto Reclamation", status: "Planned", crew: ["Sam", "Tina"]}
-	];
+	const INITIAL_HEALTH = 100;
+	const INITIAL_GAME_STATUS = "ongoing";
+
+	const [playerHealth, setPlayerHealth] = useState(INITIAL_HEALTH);
+	const [enemyHealth, setEnemyHealth] = useState(INITIAL_HEALTH);
+
+	const [gameStatus, setGameStatus] = useState(INITIAL_GAME_STATUS); // Possible values: "ongoing", "won", "lost", "draw"
+
+	function handleAttack ()
+	{
+		const playerAttack = Math.floor(Math.random() * (maxDamage - minDamage + 1)) + minDamage;
+		const enemyAttack = Math.floor(Math.random() * (maxDamage - minDamage + 1)) + minDamage;
+
+		const newPlayerHealth = Math.max(playerHealth - enemyAttack, 0);
+		const newEnemyHealth = Math.max(enemyHealth - playerAttack, 0);
+
+		setPlayerHealth(newPlayerHealth);
+		setEnemyHealth(newEnemyHealth);
+
+		if (newPlayerHealth === 0 && newEnemyHealth === 0)
+		{
+			setGameStatus("draw");
+		}
+		else if (newEnemyHealth === 0)
+		{
+			setGameStatus("won");
+		}
+		else if (newPlayerHealth === 0)
+		{
+			setGameStatus("lost");
+		}
+	}
+
+	function handleRestart ()
+	{
+		setPlayerHealth(INITIAL_HEALTH);
+		setEnemyHealth(INITIAL_HEALTH);
+		setGameStatus(INITIAL_GAME_STATUS);
+	}
+
+	function renderGameStatusMessage ()
+	{
+		switch (gameStatus)
+		{
+			case "won":
+				return "Winner!";
+			case "lost":
+				return "Defeated!";
+			case "draw":
+				return "Draw!";
+			default:
+				return "Battle!";
+		}
+	}
+
+	function renderHealth (health)
+	{
+		let emoji;
+
+		if (health === INITIAL_HEALTH)
+		{
+			emoji = "⚔️";
+		}
+		else if (health === 0)
+		{
+			emoji = "💀";
+		}
+		else
+		{
+			emoji = "🔫";
+		}
+
+		return `${health} ${emoji}`;
+	}
 
 	return (
-		<div className={styles.mainContainer}>
-			<MissionControl initialMissions={INITIAL_MISSIONS} />
+		<div className={"main"}>
+			<div className={"title"}>
+				<h1>Space Battle Simulator</h1>
+			</div>
+
+			<div className="battlefield">
+				<div className={"player"}>
+					<p>Player Health: <span className={"score"}>{renderHealth(playerHealth)}</span></p>
+				</div>
+
+				{
+					gameStatus === "ongoing"
+					&&
+					<div className={"attack"}>
+						<button onClick={handleAttack}>Fire!</button>
+					</div>
+				}
+
+				{
+					gameStatus !== "ongoing"
+					&&
+					<div className={"restart"}>
+						<button onClick={handleRestart}>Continue?</button>
+					</div>
+				}
+
+				<div className={"enemy"}>
+					<p>Enemy Health: <span className={"score"}>{renderHealth(enemyHealth)}</span></p>
+				</div>
+			</div>
+
+			<div className={"message"}>
+				<p>{renderGameStatusMessage()}</p>
+			</div>
 		</div>
 	);
 }
 
 export default App;
+
+

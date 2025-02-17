@@ -1,11 +1,11 @@
-import React from 'react';
-import Deck from "./Deck"
+import Space from "./Space.jsx";
 
-function App () {
+function App() {
   return (
-    <div className="App">
-      <h1>Welcome to the Deck of Cards!</h1>
-      <Deck />
-    </div>
+    <>
+    <Space />
+    </>
   );
 }
+
+export default App;

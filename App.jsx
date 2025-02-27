@@ -1,10 +1,10 @@
-import Space from "./Space.jsx";
+import SpaceShip from "./Spaceship";
 
 function App() {
   return (
-    <>
-    <Space />
-    </>
+    <div className="App">
+      <SpaceShip />
+    </div>
   );
 }
 
